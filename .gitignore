@@ -1,0 +1,42 @@
+# Ignore sensitive files
+.env
+.env.*
+*.key
+*.pem
+secrets.json
+credentials.json
+config.local.js
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# IDE
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Temp
+*.tmp
+*.temp
+.cache/

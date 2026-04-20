@@ -1,0 +1,71 @@
+name: 🚀 CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: 📦 Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          else
+            echo "No package.json found, skipping..."
+          fi
+
+      - name: 🧪 Run tests
+        run: |
+          if [ -f package.json ] && grep -q '"test"' package.json; then
+            npm test
+          else
+            echo "No tests configured, skipping..."
+          fi
+
+      - name: 🏗️ Build
+        run: |
+          if [ -f package.json ] && grep -q '"build"' package.json; then
+            npm run build
+          else
+            echo "No build script, skipping..."
+          fi
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Check for sensitive files
+        run: |
+          echo "Checking for accidentally committed sensitive files..."
+          if find . -name "*.env" -not -path "./.git/*" | grep -q .; then
+            echo "⚠️ WARNING: .env files found!"
+            find . -name "*.env" -not -path "./.git/*"
+          else
+            echo "✅ No .env files found"
+          fi
+
+      - name: 📊 Repository stats
+        run: |
+          echo "📁 Files: $(find . -not -path './.git/*' -type f | wc -l)"
+          echo "📝 Last commit: $(git log -1 --format='%s by %an')"
+          echo "🌿 Branch: ${{ github.ref_name }}"
