@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiAI Services Hub</title>
+  <style>
+    :root {
+      --accent: #6366f1;
+      --accent-dim: #4f46e5;
+      --accent-glow: rgba(99,102,241,.25);
+      --bg: #0f1117;
+      --bg2: #161b27;
+      --bg3: #1e2535;
+      --card: #1a2035;
+      --border: rgba(99,102,241,.18);
+      --text: #e2e8f0;
+      --muted: #7c8ba1;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --cyan: #22d3ee;
+      --pink: #ec4899;
+      --radius: 14px;
+      --font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top bar ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -.3px;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(99,102,241,.4);
+    }
+
+    .logo-sub {
+      color: var(--muted);
+      font-weight: 400;
+      font-size: .82rem;
+      margin-left: 2px;
+    }
+
+    .header-right { display: flex; align-items: center; gap: 12px; }
+
+    .status-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: .8rem;
+      font-weight: 500;
+    }
+
+    .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: pulse 2s infinite;
+    }
+    .dot.live { background: var(--green); }
+    .dot.dead { background: var(--red); animation: none; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .token-input {
+      padding: 6px 12px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: .8rem;
+      width: 210px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .token-input:focus { border-color: var(--accent); }
+    .token-input::placeholder { color: var(--muted); }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+    }
+    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 0 16px var(--accent-glow); }
+    .btn-primary:hover { background: var(--accent-dim); transform: translateY(-1px); }
+    .btn-ghost { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 4px 10px; font-size: .76rem; }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 0;
+    }
+
+    /* ── Sidebar ── */
+    aside {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 14px 10px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 500;
+      transition: all .15s;
+      border: 1px solid transparent;
+    }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: var(--accent-glow); color: var(--accent); border-color: var(--border); }
+    .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 100px;
+      font-size: .65rem;
+      padding: 1px 6px;
+      font-weight: 700;
+    }
+
+    /* ── Content ── */
+    .content {
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .page { display: none; }
+    .page.active { display: contents; }
+
+    /* ── Grid ── */
+    .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .card:hover { border-color: rgba(99,102,241,.4); box-shadow: 0 0 28px rgba(99,102,241,.07); }
+
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: .73rem; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .8px;
+    }
+    .card-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; background: var(--bg3);
+    }
+
+    .stat-value { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+    .stat-label { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+    .stat-delta { font-size: .73rem; margin-top: 5px; display: flex; align-items: center; gap: 3px; }
+    .delta-up { color: var(--green); }
+    .delta-dn { color: var(--red); }
+
+    /* ── Section title ── */
+    .section-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+    .section-sub { font-size: .82rem; color: var(--muted); }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: var(--bg3); color: var(--muted);
+      font-size: .71rem; text-transform: uppercase; letter-spacing: .7px;
+      padding: 9px 14px; text-align: left; font-weight: 700;
+    }
+    td { padding: 11px 14px; font-size: .84rem; border-top: 1px solid var(--border); }
+    tr:hover td { background: var(--bg3); }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 8px; border-radius: 100px;
+      font-size: .71rem; font-weight: 600;
+    }
+    .badge-green { background: rgba(34,197,94,.15); color: var(--green); }
+    .badge-red   { background: rgba(239,68,68,.15);  color: var(--red); }
+    .badge-yellow{ background: rgba(245,158,11,.15); color: var(--yellow); }
+    .badge-blue  { background: rgba(99,102,241,.15); color: #818cf8; }
+    .badge-cyan  { background: rgba(34,211,238,.15); color: var(--cyan); }
+    .badge-pink  { background: rgba(236,72,153,.15); color: var(--pink); }
+
+    /* ── AI Tool card ── */
+    .tool-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tool-card:hover { border-color: rgba(99,102,241,.5); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+    .tool-card.unavailable { opacity: .45; cursor: default; }
+    .tool-card.unavailable:hover { transform: none; box-shadow: none; border-color: var(--border); }
+
+    .tool-icon { font-size: 1.8rem; }
+    .tool-name { font-size: .9rem; font-weight: 700; }
+    .tool-desc { font-size: .75rem; color: var(--muted); line-height: 1.4; }
+    .tool-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+    .tool-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+
+    /* ── Chat ── */
+    .chat-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 14px;
+      height: calc(100vh - 130px);
+    }
+
+    .chat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg3);
+    }
+
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 18px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .msg { display: flex; gap: 8px; align-items: flex-start; max-width: 85%; }
+    .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+
+    .msg-bubble {
+      padding: 9px 13px; border-radius: 13px;
+      font-size: .86rem; line-height: 1.55;
+    }
+    .msg.bot  .msg-bubble { background: var(--bg3); border-bottom-left-radius: 4px; }
+    .msg.user .msg-bubble { background: var(--accent); border-bottom-right-radius: 4px; color: #fff; }
+    .msg-time { font-size: .67rem; color: var(--muted); margin-top: 3px; padding: 0 3px; }
+
+    .chat-input-bar {
+      padding: 12px 14px; border-top: 1px solid var(--border);
+      display: flex; gap: 8px; background: var(--bg2);
+    }
+
+    .chat-input {
+      flex: 1; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: .86rem;
+      padding: 9px 13px; outline: none; resize: none;
+      font-family: var(--font); line-height: 1.4; transition: border-color .2s;
+    }
+    .chat-input:focus { border-color: var(--accent); }
+
+    .send-btn {
+      width: 40px; height: 40px; background: var(--accent); border: none;
+      border-radius: 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; transition: all .2s; flex-shrink: 0;
+    }
+    .send-btn:hover { background: var(--accent-dim); transform: translateY(-1px); }
+
+    /* ── Sessions panel ── */
+    .sessions-panel {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .panel-header {
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+      font-size: .78rem; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .7px; background: var(--bg3);
+    }
+    .session-list { overflow-y: auto; flex: 1; }
+    .session-item {
+      padding: 11px 14px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background .15s;
+    }
+    .session-item:hover { background: var(--bg3); }
+    .session-item.active { background: var(--accent-glow); border-left: 2px solid var(--accent); }
+    .session-key {
+      font-size: .75rem; font-family: 'JetBrains Mono', monospace;
+      color: var(--accent); margin-bottom: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .session-meta { font-size: .71rem; color: var(--muted); display: flex; gap: 6px; }
+
+    /* ── Log ── */
+    .log-box {
+      background: #0a0d14; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: .76rem; line-height: 1.7;
+      height: 380px; overflow-y: auto; color: #94a3b8;
+    }
+    .log-line { display: flex; gap: 12px; }
+    .log-time { color: #475569; flex-shrink: 0; }
+    .log-level-info  { color: #38bdf8; }
+    .log-level-warn  { color: var(--yellow); }
+    .log-level-error { color: var(--red); }
+    .log-msg { color: #94a3b8; }
+
+    /* ── GitHub section ── */
+    .github-stat {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 10px;
+      background: var(--bg3); border: 1px solid var(--border);
+      font-size: .84rem;
+    }
+    .github-stat .g-icon { font-size: 1.2rem; }
+    .github-stat .g-label { color: var(--muted); font-size: .75rem; }
+    .github-stat .g-val  { font-weight: 700; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 22px; right: 22px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 12px; padding: 11px 16px;
+      font-size: .83rem; box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      opacity: 0; transform: translateY(10px);
+      transition: all .3s; z-index: 999; max-width: 300px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      aside { display: none; }
+      .grid-4,.grid-3,.grid-5 { grid-template-columns: repeat(2,1fr); }
+      .chat-layout { grid-template-columns: 1fr; }
+      .sessions-panel { display: none; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🤖</div>
+    <span>SiAI Services Hub</span>
+    <span class="logo-sub">v2.0</span>
+  </div>
+  <div class="header-right">
+    <input class="token-input" id="tokenInput" type="password"
+      placeholder="OpenClaw gateway token…" />
+    <button class="btn btn-primary" onclick="connect()">Kết nối</button>
+    <div class="status-pill">
+      <div class="dot" id="statusDot"></div>
+      <span id="statusText">Chưa kết nối</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ══ SIDEBAR ══ -->
+  <aside>
+    <div class="nav-section">Tổng quan</div>
+    <div class="nav-item active" onclick="showPage('overview',this)">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+
+    <div class="nav-section">OpenClaw Gateway</div>
+    <div class="nav-item" onclick="showPage('chat',this)">
+      <span class="nav-icon">💬</span> Chat với Agent
+    </div>
+    <div class="nav-item" onclick="showPage('sessions',this)">
+      <span class="nav-icon">🗂️</span> Sessions
+    </div>
+    <div class="nav-item" onclick="showPage('channels',this)">
+      <span class="nav-icon">📡</span> Channels
+    </div>
+    <div class="nav-item" onclick="showPage('logs',this)">
+      <span class="nav-icon">📜</span> Logs realtime
+    </div>
+
+    <div class="nav-section">AI Services</div>
+    <div class="nav-item" onclick="showPage('ai-chat',this)">
+      <span class="nav-icon">🧠</span> AI Chat & LLM
+    </div>
+    <div class="nav-item" onclick="showPage('ai-code',this)">
+      <span class="nav-icon">💻</span> AI Coding
+    </div>
+    <div class="nav-item" onclick="showPage('ai-auto',this)">
+      <span class="nav-icon">⚙️</span> Automation
+    </div>
+    <div class="nav-item" onclick="showPage('ai-media',this)">
+      <span class="nav-icon">🎨</span> Image / Video / Audio
+    </div>
+
+    <div class="nav-section">GitHub</div>
+    <div class="nav-item" onclick="showPage('github',this)">
+      <span class="nav-icon">🐙</span> GitHub Stats
+    </div>
+    <div class="nav-item" onclick="openGitHub()">
+      <span class="nav-icon">↗</span> Mở GitHub <span style="font-size:.7rem;color:var(--muted)">↗</span>
+    </div>
+
+    <div class="divider"></div>
+    <div class="nav-item" onclick="openOriginalDashboard()">
+      <span class="nav-icon">🦞</span> OpenClaw UI <span style="font-size:.7rem;color:var(--muted)">↗</span>
+    </div>
+  </aside>
+
+  <!-- ══ CONTENT ══ -->
+  <div class="content">
+
+    <!-- ▸ PAGE: OVERVIEW ── -->
+    <div class="page active" id="page-overview">
+      <div>
+        <div class="section-title">SiAI Services Hub — Tổng quan</div>
+        <div class="section-sub" id="lastUpdate">Nhấn "Kết nối" để tải dữ liệu từ OpenClaw Gateway</div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="grid-4">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Gateway</span><div class="card-icon">🌐</div></div>
+          <div class="stat-value" id="stat-gateway">--</div>
+          <div class="stat-label">OpenClaw status</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Sessions</span><div class="card-icon">🗂️</div></div>
+          <div class="stat-value" id="stat-sessions">--</div>
+          <div class="stat-label">Đang hoạt động</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">AI Tools</span><div class="card-icon">🤖</div></div>
+          <div class="stat-value">40+</div>
+          <div class="stat-label">Công cụ AI tích hợp</div>
+          <div class="stat-delta delta-up">↑ 8 nhóm</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Channels</span><div class="card-icon">📡</div></div>
+          <div class="stat-value" id="stat-channels">--</div>
+          <div class="stat-label">Kênh kết nối</div>
+        </div>
+      </div>
+
+      <!-- API Provider highlight -->
+      <div class="card" style="background: linear-gradient(135deg,rgba(99,102,241,.12),rgba(236,72,153,.06)); border-color: rgba(99,102,241,.35);">
+        <div class="card-header">
+          <span class="card-title">🔗 API Provider — TrollLM</span>
+          <span class="badge badge-green">● Active</span>
+        </div>
+        <div style="font-size:.88rem; margin-bottom:8px;">
+          <code style="color:var(--cyan);background:var(--bg3);padding:3px 8px;border-radius:6px;font-size:.8rem">https://chat.trollllm.xyz/v1</code>
+        </div>
+        <div style="font-size:.8rem;color:var(--muted);line-height:1.7">
+          Hỗ trợ <strong style="color:var(--text)">20 models</strong> —
+          Claude Opus/Sonnet/Haiku · GPT-5.x · Gemini 3.x · Grok ·
+          OpenAI-compatible format · Dùng được với mọi tool hỗ trợ custom API
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+          <span class="badge badge-blue">claude-opus-4.7</span>
+          <span class="badge badge-blue">claude-sonnet-4.6</span>
+          <span class="badge badge-cyan">gpt-5.4</span>
+          <span class="badge badge-cyan">gpt-5.3-codex</span>
+          <span class="badge badge-pink">gemini-3.1-pro</span>
+          <span class="badge badge-yellow">grok-code-fast-1</span>
+        </div>
+      </div>
+
+      <!-- Sessions + Channels -->
+      <div class="grid-2">
+        <div>
+          <div class="section-title" style="margin-bottom:10px">Sessions đang chạy</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Session Key</th><th>Model</th><th>Trạng thái</th></tr></thead>
+              <tbody id="sessionsTable">
+                <tr><td colspan="3" style="color:var(--muted);text-align:center;padding:20px">Kết nối để tải dữ liệu</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="section-title" style="margin-bottom:10px">Channels kết nối</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kênh</th><th>Trạng thái</th><th>Tài khoản</th></tr></thead>
+              <tbody id="channelsTable">
+                <tr><td colspan="3" style="color:var(--muted);text-align:center;padding:20px">Kết nối để tải dữ liệu</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ PAGE: CHAT ── -->
+    <div class="page" id="page-chat">
+      <div class="section-title">Chat với OpenClaw Agent</div>
+      <div class="chat-layout">
+        <div class="chat-box">
+          <div class="chat-header">
+            <div class="avatar">🦞</div>
+            <div>
+              <div style="font-weight:700;font-size:.9rem">OpenClaw AI Agent</div>
+              <div style="font-size:.72rem;color:var(--green)">● Powered by TrollLM</div>
+            </div>
+            <div style="margin-left:auto">
+              <select id="modelSelect" style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:.78rem;outline:none">
+                <option value="claude-sonnet-4.6">claude-sonnet-4.6</option>
+                <option value="claude-opus-4.7">claude-opus-4.7</option>
+                <option value="gpt-5.4">gpt-5.4</option>
+                <option value="gemini-3.1-pro-preview">gemini-3.1-pro</option>
+                <option value="grok-code-fast-1">grok-code-fast-1</option>
+              </select>
+            </div>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="msg bot">
+              <div class="avatar" style="width:28px;height:28px;font-size:12px">🤖</div>
+              <div>
+                <div class="msg-bubble">Xin chào! Tôi là <strong>SiAI Hub Agent</strong> — tích hợp OpenClaw Gateway.<br>Kết nối gateway ở góc trên để chat trực tiếp, hoặc hỏi tôi về bất kỳ AI tool nào! 👋</div>
+                <div class="msg-time">Vừa xong</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <textarea class="chat-input" id="chatInput" rows="1"
+              placeholder="Nhập tin nhắn… (Enter gửi, Shift+Enter xuống dòng)"
+              onkeydown="handleChatKey(event)"></textarea>
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+          </div>
+        </div>
+        <div class="sessions-panel">
+          <div class="panel-header">Sessions</div>
+          <div class="session-list" id="sessionList">
+            <div style="padding:14px;color:var(--muted);font-size:.82rem">Kết nối để xem sessions…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ PAGE: SESSIONS ── -->
+    <div class="page" id="page-sessions">
+      <div class="section-title">Quản lý Sessions</div>
+      <div class="table-wrap" style="margin-top:10px">
+        <table>
+          <thead><tr><th>Session Key</th><th>Loại</th><th>Model</th><th>Tokens</th><th>Thời gian</th></tr></thead>
+          <tbody id="sessionsFullTable">
+            <tr><td colspan="5" style="color:var(--muted);text-align:center;padding:28px">Kết nối để xem dữ liệu</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ▸ PAGE: CHANNELS ── -->
+    <div class="page" id="page-channels">
+      <div class="section-title">Kênh kết nối</div>
+      <div class="grid-3" id="channelCards" style="margin-top:10px">
+        <div class="card" style="text-align:center;padding:28px;color:var(--muted)">Kết nối gateway để xem channels</div>
+      </div>
+    </div>
+
+    <!-- ▸ PAGE: LOGS ── -->
+    <div class="page" id="page-logs">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="section-title">Logs realtime</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="clearLogs()">Xóa</button>
+          <button class="btn btn-ghost btn-sm" id="followBtn" onclick="toggleFollow()">⏸ Dừng</button>
+        </div>
+      </div>
+      <div class="log-box" id="logBox">
+        <div class="log-line">
+          <span class="log-time">--:--:--</span>
+          <span class="log-level-info">INFO</span>
+          <span class="log-msg">SiAI Services Hub khởi động — kết nối OpenClaw gateway để xem logs realtime…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ▸ PAGE: AI CHAT ── -->
+    <div class="page" id="page-ai-chat">
+      <div><div class="section-title">🧠 AI Chat & LLM Tools</div>
+      <div class="section-sub">Các công cụ hỏi đáp, viết lách, phân tích — sử dụng TrollLM API</div></div>
+      <div class="grid-3" id="chatToolsGrid"></div>
+    </div>
+
+    <!-- ▸ PAGE: AI CODE ── -->
+    <div class="page" id="page-ai-code">
+      <div><div class="section-title">💻 AI Coding Tools</div>
+      <div class="section-sub">IDE AI, terminal agents — tích hợp TrollLM để coding hiệu quả</div></div>
+      <div class="grid-3" id="codeToolsGrid"></div>
+    </div>
+
+    <!-- ▸ PAGE: AI AUTO ── -->
+    <div class="page" id="page-ai-auto">
+      <div><div class="section-title">⚙️ AI Automation & Workflow</div>
+      <div class="section-sub">Tự động hóa quy trình doanh nghiệp với AI</div></div>
+      <div class="grid-3" id="autoToolsGrid"></div>
+    </div>
+
+    <!-- ▸ PAGE: AI MEDIA ── -->
+    <div class="page" id="page-ai-media">
+      <div><div class="section-title">🎨 AI Image / Video / Audio / Design</div>
+      <div class="section-sub">Sáng tạo nội dung đa phương tiện với AI</div></div>
+      <div class="grid-3" id="mediaToolsGrid"></div>
+    </div>
+
+    <!-- ▸ PAGE: GITHUB ── -->
+    <div class="page" id="page-github">
+      <div><div class="section-title">🐙 GitHub — SiAI Services Hub</div>
+      <div class="section-sub">Repo: <a href="https://github.com/conginai/SiAI-Services-Hub" target="_blank" style="color:var(--accent)">github.com/conginai/SiAI-Services-Hub</a></div></div>
+
+      <div class="grid-4" id="githubStats">
+        <div class="card"><div class="card-header"><span class="card-title">Repository</span><div class="card-icon">📁</div></div>
+          <div class="stat-value" style="font-size:1.1rem;letter-spacing:0">SiAI-Services-Hub</div>
+          <div class="stat-label">conginai / public</div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Branch</span><div class="card-icon">🌿</div></div>
+          <div class="stat-value">main</div><div class="stat-label">Default branch</div></div>
+        <div class="card"><div class="card-header"><span class="card-title">CI/CD</span><div class="card-icon">🚀</div></div>
+          <div class="stat-value" style="font-size:1.1rem">Actions</div>
+          <div class="stat-label">2 workflows active</div>
+          <div class="stat-delta delta-up">↑ CI + Deploy</div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Pages</span><div class="card-icon">🌐</div></div>
+          <div class="stat-value" style="font-size:1rem">Live</div>
+          <div class="stat-label">GitHub Pages enabled</div></div>
+      </div>
+
+      <div class="section-title" style="margin-top:4px">Workflows đang chạy</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Workflow</th><th>Trigger</th><th>Branch</th><th>Trạng thái</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>🚀 CI Pipeline</td>
+              <td><span class="badge badge-blue">push</span></td>
+              <td><code style="font-size:.78rem">main</code></td>
+              <td><span class="badge badge-green" id="ci-status">● Checking…</span></td>
+            </tr>
+            <tr>
+              <td>🌐 Deploy to GitHub Pages</td>
+              <td><span class="badge badge-blue">push</span></td>
+              <td><code style="font-size:.78rem">main</code></td>
+              <td><span class="badge badge-green" id="deploy-status">● Checking…</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:10px">⚡ Quick Actions</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-ghost" style="text-align:left;width:100%" onclick="window.open('https://github.com/conginai/SiAI-Services-Hub/actions','_blank')">📋 Xem Actions logs ↗</button>
+            <button class="btn btn-ghost" style="text-align:left;width:100%" onclick="window.open('https://github.com/conginai/SiAI-Services-Hub/issues/new','_blank')">🐛 Tạo Issue mới ↗</button>
+            <button class="btn btn-ghost" style="text-align:left;width:100%" onclick="window.open('https://github.com/conginai/SiAI-Services-Hub/compare','_blank')">🔀 Tạo Pull Request ↗</button>
+            <button class="btn btn-ghost" style="text-align:left;width:100%" onclick="window.open('https://conginai.github.io/SiAI-Services-Hub/dashboard/','_blank')">🌐 Xem GitHub Pages ↗</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:10px">🔧 Git Quick Commands</div>
+          <div class="log-box" style="height:180px;font-size:.74rem">
+            <div class="log-line"><span class="log-level-info">CMD</span><span class="log-msg">git status</span></div>
+            <div class="log-line"><span class="log-level-info">CMD</span><span class="log-msg">git add . && git commit -m "feat: ..."</span></div>
+            <div class="log-line"><span class="log-level-info">CMD</span><span class="log-msg">git push origin main</span></div>
+            <div class="log-line"><span class="log-level-info">CMD</span><span class="log-msg">gh pr create --fill</span></div>
+            <div class="log-line"><span class="log-level-info">CMD</span><span class="log-msg">gh run list --limit 5</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .content -->
+</main>
+
+<div id="toast"></div>
+
+<script>
+// ══ CONFIG ══
+const GATEWAY = 'http://127.0.0.1:18789'
+const GITHUB_REPO = 'conginai/SiAI-Services-Hub'
+
+// ══ AI TOOLS DATA ══
+const AI_TOOLS = {
+  chat: [
+    { icon:'🤖', name:'Claude Code',    desc:'Terminal AI agent — đang dùng chính, tích hợp TrollLM',  tags:['TrollLM','terminal'],  url:'https://claude.ai/code',        status:'active' },
+    { icon:'📟', name:'Codex CLI',      desc:'OpenAI Codex terminal — hỗ trợ TrollLM',                 tags:['TrollLM','terminal'],  url:'https://github.com/openai/codex',status:'active' },
+    { icon:'🖥️', name:'Open WebUI',     desc:'ChatGPT-like UI self-host, kết nối TrollLM',              tags:['TrollLM','self-host'], url:'http://localhost:3000',          status:'active' },
+    { icon:'🔍', name:'Perplexity',     desc:'AI search engine — API riêng, không dùng TrollLM',        tags:['search','API riêng'],  url:'https://perplexity.ai',          status:'other'  },
+    { icon:'🐦', name:'Poe',            desc:'Đa model chat, so sánh models — không dùng TrollLM',      tags:['multi-model'],         url:'https://poe.com',               status:'other'  },
+  ],
+  code: [
+    { icon:'🖱️', name:'Cursor',         desc:'IDE AI mạnh nhất — custom API TrollLM, tự động code',    tags:['TrollLM','IDE'],        url:'https://cursor.sh',             status:'active' },
+    { icon:'🏄', name:'Windsurf',       desc:'IDE agentic từ Codeium — hỗ trợ TrollLM',                tags:['TrollLM','IDE'],        url:'https://codeium.com/windsurf',  status:'active' },
+    { icon:'🔗', name:'Continue.dev',   desc:'VS Code extension đa model — TrollLM ready',              tags:['TrollLM','VS Code'],    url:'https://continue.dev',          status:'active' },
+    { icon:'🦾', name:'Cline',          desc:'VS Code AI agent mạnh nhất — v3.79.0 đã cài ✅',         tags:['TrollLM','VS Code'],    url:'vscode:extension/saoudrizwan.claude-dev', status:'active' },
+    { icon:'🦘', name:'Roo Code',       desc:'Fork Cline, multi-agent — v3.52.1 đã cài ✅',            tags:['TrollLM','VS Code'],    url:'vscode:extension/rooveterinaryinc.roo-cline', status:'active' },
+    { icon:'⌨️', name:'Aider',          desc:'Terminal AI pair programmer — TrollLM compatible',        tags:['TrollLM','terminal'],   url:'https://aider.chat',            status:'active' },
+  ],
+  auto: [
+    { icon:'🔄', name:'n8n',            desc:'Workflow automation + AI nodes — tích hợp TrollLM',       tags:['TrollLM','workflow'],   url:'http://localhost:5678',         status:'active' },
+    { icon:'🏗️', name:'Dify',           desc:'Build AI App, chatbot, RAG — TrollLM compatible',         tags:['TrollLM','RAG'],        url:'http://localhost:80',           status:'active' },
+    { icon:'🌊', name:'Flowise',        desc:'Drag & drop LLM pipelines — TrollLM ready',               tags:['TrollLM','no-code'],    url:'http://localhost:3001',         status:'active' },
+    { icon:'🪐', name:'Antigravity',    desc:'AI Gateway đang cấu hình — tích hợp TrollLM',             tags:['TrollLM','gateway'],    url:'http://localhost:18789',        status:'active' },
+  ],
+  media: [
+    { icon:'🎨', name:'Midjourney',     desc:'Ảnh nghệ thuật đẹp nhất — qua Discord/Web',               tags:['image','Discord'],      url:'https://midjourney.com',        status:'other'  },
+    { icon:'🖼️', name:'Stable Diffusion',desc:'Local, miễn phí, mã nguồn mở',                           tags:['image','local'],        url:'https://stability.ai',          status:'other'  },
+    { icon:'📽️', name:'Runway ML',      desc:'Video AI cao cấp — dùng Hollywood',                       tags:['video','premium'],      url:'https://runway.com',            status:'other'  },
+    { icon:'🎬', name:'Kling AI',       desc:'Video dài, chuyển động tự nhiên',                         tags:['video'],                url:'https://klingai.com',           status:'other'  },
+    { icon:'🎙️', name:'ElevenLabs',     desc:'TTS & Voice Clone tốt nhất — có tiếng Việt',              tags:['audio','TTS'],          url:'https://elevenlabs.io',         status:'other'  },
+    { icon:'🎵', name:'Suno AI',        desc:'Tạo nhạc hoàn chỉnh từ text',                             tags:['music','AI'],           url:'https://suno.com',              status:'other'  },
+    { icon:'🖌️', name:'Canva AI',       desc:'Design nhanh, dễ dùng, đa năng ⭐',                       tags:['design','easy'],        url:'https://canva.com',             status:'other'  },
+    { icon:'📊', name:'Gamma AI',       desc:'Slide & presentation tự động ⭐',                          tags:['presentation'],         url:'https://gamma.app',             status:'other'  },
+    { icon:'🎭', name:'HeyGen',         desc:'AI Avatar, dịch & lồng tiếng video ⭐',                   tags:['video','avatar'],        url:'https://heygen.com',            status:'other'  },
+  ]
+}
+
+// ══ STATE ══
+let ws = null, wsToken = '', followLogs = true, sessions = []
+
+// ══ RENDER AI TOOLS ══
+function renderTools(list, containerId) {
+  document.getElementById(containerId).innerHTML = list.map(t => `
+    <div class="tool-card ${t.status!=='active'?'unavailable':''}"
+      onclick="${t.status==='active'?`openTool('${t.url}')`:''}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:2rem">${t.icon}</div>
+        <div>
+          <div class="tool-name">${t.name}</div>
+          <div class="tool-desc">${t.desc}</div>
+        </div>
+      </div>
+      <div class="tool-footer">
+        <div class="tool-tags">
+          ${t.tags.map(tag=>`<span class="badge ${tag==='TrollLM'?'badge-green':tag==='VS Code'?'badge-blue':'badge-yellow'}">${tag}</span>`).join('')}
+        </div>
+        <span class="badge ${t.status==='active'?'badge-green':'badge-yellow'}">
+          ${t.status==='active'?'● Ready':'○ External'}
+        </span>
+      </div>
+    </div>
+  `).join('')
+}
+
+function openTool(url) {
+  if (url.startsWith('vscode:')) { window.open(url); return }
+  window.open(url, '_blank')
+}
+
+// ══ NAVIGATION ══
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
+  document.getElementById('page-' + name).classList.add('active')
+  if (el) el.classList.add('active')
+}
+
+function openOriginalDashboard() { window.open(GATEWAY, '_blank') }
+function openGitHub() { window.open('https://github.com/' + GITHUB_REPO, '_blank') }
+
+// ══ TOAST ══
+function toast(msg, color='') {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.style.borderColor = color || 'var(--border)'
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 3000)
+}
+
+// ══ CONNECT ══
+async function connect() {
+  wsToken = document.getElementById('tokenInput').value.trim()
+  localStorage.setItem('oc_token', wsToken)
+  setStatus('connecting')
+  try {
+    const r = await fetch(GATEWAY + '/health')
+    const data = await r.json()
+    if (data.ok) {
+      setStatus('live')
+      toast('✅ OpenClaw Gateway kết nối thành công!', 'var(--green)')
+      fetchStatus()
+      startWs()
+      startAutoRefresh()
+    }
+  } catch(e) {
+    setStatus('dead')
+    toast('❌ Không kết nối được Gateway: ' + e.message, 'var(--red)')
+    addLog('error', 'Gateway connection failed: ' + e.message)
+  }
+}
+
+function setStatus(s) {
+  const dot = document.getElementById('statusDot')
+  const txt = document.getElementById('statusText')
+  dot.className = 'dot'
+  if (s === 'live')       { dot.classList.add('live'); txt.textContent = 'Gateway Online' }
+  else if (s === 'dead')  { dot.classList.add('dead'); txt.textContent = 'Lỗi kết nối' }
+  else                    { txt.textContent = 'Đang kết nối…' }
+}
+
+// ══ FETCH STATUS ══
+async function fetchStatus() {
+  try {
+    const r = await fetch(GATEWAY + '/health')
+    const h = await r.json()
+    document.getElementById('stat-gateway').textContent = h.ok ? '🟢 Live' : '🔴 Down'
+    document.getElementById('lastUpdate').textContent = 'Cập nhật: ' + new Date().toLocaleTimeString('vi-VN')
+  } catch(e) {
+    document.getElementById('stat-gateway').textContent = '🔴 Offline'
+  }
+  document.getElementById('stat-sessions').textContent = sessions.length || '3'
+  document.getElementById('stat-channels').textContent = '1'
+  renderMockSessions()
+  renderMockChannels()
+}
+
+function renderMockSessions() {
+  const rows = [
+    { key: 'agent:main:telegram:direct:8087…', model: 'gpt-5.2', status: 'active' },
+    { key: 'agent:main:main',                   model: 'gpt-5.2', status: 'active' },
+    { key: 'agent:main:telegram:slash:80871…',  model: 'gpt-5.2', status: 'idle'   },
+  ]
+  document.getElementById('sessionsTable').innerHTML = rows.map(r=>`<tr>
+    <td style="font-family:monospace;font-size:.76rem;color:var(--accent)">${r.key}</td>
+    <td><span class="badge badge-blue">${r.model}</span></td>
+    <td><span class="badge ${r.status==='active'?'badge-green':'badge-yellow'}">${r.status==='active'?'● Hoạt động':'○ Idle'}</span></td>
+  </tr>`).join('')
+
+  document.getElementById('sessionsFullTable').innerHTML = rows.map(r=>`<tr>
+    <td style="font-family:monospace;font-size:.76rem;color:var(--accent)">${r.key}</td>
+    <td><span class="badge badge-blue">direct</span></td>
+    <td><span class="badge badge-blue">${r.model}</span></td>
+    <td style="color:var(--muted)">~20k</td>
+    <td style="color:var(--muted)">18h trước</td>
+  </tr>`).join('')
+
+  document.getElementById('sessionList').innerHTML = rows.map((r,i)=>`
+    <div class="session-item ${i===0?'active':''}" onclick="selectSession(this)">
+      <div class="session-key">${r.key}</div>
+      <div class="session-meta">
+        <span>${r.model}</span>
+        <span class="badge ${r.status==='active'?'badge-green':'badge-yellow'}" style="font-size:.63rem;padding:1px 5px">${r.status}</span>
+      </div>
+    </div>`).join('')
+}
+
+function renderMockChannels() {
+  document.getElementById('channelsTable').innerHTML = `<tr>
+    <td>📱 Telegram</td>
+    <td><span class="badge badge-green">● ON · OK</span></td>
+    <td style="color:var(--muted)">1/1</td>
+  </tr>`
+  document.getElementById('channelCards').innerHTML = `
+    <div class="card">
+      <div class="card-header"><span style="font-size:1.3rem">📱</span><span class="badge badge-green">● Hoạt động</span></div>
+      <div style="font-weight:700;margin-bottom:4px">Telegram</div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Bot · 1 tài khoản</div>
+      <div style="font-size:.73rem;color:var(--muted)">Token: 8763…LvWE</div>
+      <div style="margin-top:10px;display:flex;gap:4px;flex-wrap:wrap">
+        <span class="badge badge-blue">inlineButtons: dm</span>
+        <span class="badge badge-blue">markdown: code</span>
+      </div>
+    </div>
+    <div class="card" style="opacity:.45;cursor:not-allowed">
+      <div class="card-header"><span style="font-size:1.3rem">💬</span><span class="badge badge-yellow">○ Chưa cấu hình</span></div>
+      <div style="font-weight:700;margin-bottom:4px">Discord</div>
+      <div style="font-size:.78rem;color:var(--muted)">Chưa kết nối</div>
+    </div>
+    <div class="card" style="opacity:.45;cursor:not-allowed">
+      <div class="card-header"><span style="font-size:1.3rem">💼</span><span class="badge badge-yellow">○ Chưa cấu hình</span></div>
+      <div style="font-weight:700;margin-bottom:4px">Slack</div>
+      <div style="font-size:.78rem;color:var(--muted)">Chưa kết nối</div>
+    </div>`
+}
+
+function selectSession(el) {
+  document.querySelectorAll('.session-item').forEach(s=>s.classList.remove('active'))
+  el.classList.add('active')
+}
+
+// ══ WEBSOCKET ══
+function startWs() {
+  if (ws) ws.close()
+  const url = `ws://127.0.0.1:18789/?auth.token=${encodeURIComponent(wsToken)}`
+  try {
+    ws = new WebSocket(url)
+    ws.onopen  = ()  => addLog('info', 'WebSocket kết nối thành công tới OpenClaw Gateway')
+    ws.onclose = (e) => addLog('warn', `WebSocket đóng (${e.code})`)
+    ws.onerror = ()  => addLog('error', 'WebSocket lỗi kết nối')
+    ws.onmessage = (e) => {
+      try { addLog('info', JSON.stringify(JSON.parse(e.data)).slice(0,120)) }
+      catch { addLog('info', e.data.slice(0,120)) }
+    }
+  } catch(e) { addLog('error', 'WebSocket init failed: ' + e.message) }
+}
+
+// ══ CHAT ══
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
+}
+
+function sendMessage() {
+  const inp  = document.getElementById('chatInput')
+  const text = inp.value.trim()
+  if (!text) return
+  inp.value = ''
+  appendMsg('user', text)
+
+  const typingId = 'typing-' + Date.now()
+  document.getElementById('chatMessages').insertAdjacentHTML('beforeend', `
+    <div class="msg bot" id="${typingId}">
+      <div class="avatar" style="width:26px;height:26px;font-size:11px">🤖</div>
+      <div class="msg-bubble" style="display:flex;gap:6px;align-items:center">
+        <div class="spinner"></div> Đang xử lý…
+      </div>
+    </div>`)
+  scrollChat()
+
+  setTimeout(() => {
+    document.getElementById(typingId)?.remove()
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      appendMsg('bot', '⚠️ Chưa kết nối OpenClaw Gateway. Nhấn "Kết nối" ở trên và nhập token để chat trực tiếp với agent qua WebSocket.')
+    }
+  }, 1500)
+}
+
+function appendMsg(role, text) {
+  const isUser = role === 'user'
+  const time = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})
+  document.getElementById('chatMessages').insertAdjacentHTML('beforeend', `
+    <div class="msg ${isUser?'user':'bot'}">
+      ${!isUser?'<div class="avatar" style="width:26px;height:26px;font-size:11px">🤖</div>':''}
+      <div>
+        <div class="msg-bubble">${escHtml(text)}</div>
+        <div class="msg-time">${time}</div>
+      </div>
+    </div>`)
+  scrollChat()
+}
+
+function scrollChat() {
+  const b = document.getElementById('chatMessages')
+  b.scrollTop = b.scrollHeight
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+
+// ══ LOGS ══
+function addLog(level, msg) {
+  const box = document.getElementById('logBox')
+  const time = new Date().toLocaleTimeString('vi-VN')
+  const lc = level==='error'?'log-level-error':level==='warn'?'log-level-warn':'log-level-info'
+  box.insertAdjacentHTML('beforeend', `
+    <div class="log-line">
+      <span class="log-time">${time}</span>
+      <span class="${lc}">${level.toUpperCase()}</span>
+      <span class="log-msg">${escHtml(msg)}</span>
+    </div>`)
+  if (followLogs) box.scrollTop = box.scrollHeight
+  const lines = box.querySelectorAll('.log-line')
+  if (lines.length > 200) lines[0].remove()
+}
+
+function clearLogs() { document.getElementById('logBox').innerHTML = ''; toast('Đã xóa logs') }
+function toggleFollow() {
+  followLogs = !followLogs
+  document.getElementById('followBtn').textContent = followLogs ? '⏸ Dừng' : '▶ Theo dõi'
+}
+
+// ══ AUTO REFRESH ══
+function startAutoRefresh() {
+  addLog('info', 'SiAI Services Hub — tự động làm mới mỗi 30 giây')
+  setInterval(fetchStatus, 30000)
+  setInterval(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) addLog('info', '♡ Heartbeat OK')
+  }, 60000)
+}
+
+// ══ INIT ══
+window.addEventListener('load', () => {
+  // Render AI tools
+  renderTools(AI_TOOLS.chat,  'chatToolsGrid')
+  renderTools(AI_TOOLS.code,  'codeToolsGrid')
+  renderTools(AI_TOOLS.auto,  'autoToolsGrid')
+  renderTools(AI_TOOLS.media, 'mediaToolsGrid')
+
+  // Restore token
+  const saved = localStorage.getItem('oc_token')
+  if (saved) document.getElementById('tokenInput').value = saved
+
+  addLog('info', 'SiAI Services Hub v2.0 khởi động thành công')
+  addLog('info', `GitHub: https://github.com/${GITHUB_REPO}`)
+
+  // Auto-connect
+  connect()
+})
+
+document.getElementById('tokenInput').addEventListener('change', e => {
+  localStorage.setItem('oc_token', e.target.value)
+})
+</script>
+</body>
+</html>
